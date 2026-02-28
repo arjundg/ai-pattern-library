@@ -7,7 +7,7 @@ Thank you for your interest in contributing! This project thrives on community c
 ### 1. Fork and Clone
 
 ```bash
-git clone https://github.com/yourusername/ai-pattern-library.git
+git clone https://github.com/arjundg/ai-pattern-library.git
 cd ai-pattern-library
 npm install
 ```

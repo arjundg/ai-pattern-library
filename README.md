@@ -2,7 +2,7 @@
 
 A searchable, interactive web app cataloging proven **AI engineering patterns** — RAG, chain-of-thought, tool use, memory, agents, and more — with explanations, architecture diagrams, runnable Python examples, and real-world gotchas.
 
-**[Live Demo →](https://yourusername.github.io/ai-pattern-library/)**
+**[Live Demo →](https://arjundg.github.io/ai-pattern-library/)**
 
 ## Why?
 
@@ -37,7 +37,7 @@ Educational content about AI patterns is scattered across blog posts, papers, an
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ai-pattern-library.git
+git clone https://github.com/arjundg/ai-pattern-library.git
 cd ai-pattern-library
 
 # Install dependencies
