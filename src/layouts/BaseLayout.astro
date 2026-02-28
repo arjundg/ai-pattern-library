@@ -52,32 +52,54 @@ const base = import.meta.env.BASE_URL;
     <!-- Mermaid diagram rendering -->
     <script>
       async function renderMermaid() {
-        const mermaidBlocks = document.querySelectorAll('pre.mermaid, code.language-mermaid');
+        const mermaidBlocks = document.querySelectorAll('pre[data-language="mermaid"]');
         if (mermaidBlocks.length === 0) return;
 
         const mermaid = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
         mermaid.default.initialize({
           startOnLoad: false,
-          theme: 'neutral',
-          flowchart: { useMaxWidth: true, htmlLabels: true },
+          theme: 'dark',
+          darkMode: true,
+          flowchart: { 
+            useMaxWidth: true, 
+            htmlLabels: true,
+            curve: 'basis'
+          },
+          themeVariables: {
+            darkMode: true,
+            background: '#0d1117',
+            primaryColor: '#1c2128',
+            primaryTextColor: '#e6edf3',
+            primaryBorderColor: '#58a6ff',
+            lineColor: '#8b949e',
+            secondaryColor: '#161b22',
+            tertiaryColor: '#0d1117',
+            fontSize: '16px'
+          }
         });
 
-        for (const block of mermaidBlocks) {
-          const container = block.tagName === 'CODE' ? block.parentElement! : block;
-          const code = block.textContent || '';
+        for (const preBlock of mermaidBlocks) {
+          const code = preBlock.textContent || '';
           const id = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
           try {
             const { svg } = await mermaid.default.render(id, code);
             const div = document.createElement('div');
             div.className = 'mermaid-diagram';
             div.innerHTML = svg;
-            container.replaceWith(div);
+            preBlock.replaceWith(div);
           } catch (e) {
             console.error('Mermaid render error:', e);
+            console.error('Failed code:', code);
           }
         }
       }
-      renderMermaid();
+      
+      // Wait for DOM to be fully loaded
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', renderMermaid);
+      } else {
+        renderMermaid();
+      }
     </script>
 
     <style is:global>
@@ -224,17 +246,39 @@ const base = import.meta.env.BASE_URL;
 
       /* Mermaid diagrams */
       .mermaid-diagram {
-        background: #fff;
+        background: var(--color-bg-tertiary);
         border-radius: var(--radius);
-        padding: 1.5rem;
-        margin: 1.5rem 0;
+        padding: 2rem;
+        margin: 2rem 0;
         text-align: center;
         border: 1px solid var(--color-border);
+        overflow-x: auto;
       }
 
       .mermaid-diagram svg {
         max-width: 100%;
         height: auto;
+        display: inline-block;
+      }
+
+      /* Ensure mermaid diagram text is visible */
+      .mermaid-diagram svg text {
+        fill: var(--color-text) !important;
+      }
+
+      .mermaid-diagram svg .node rect,
+      .mermaid-diagram svg .node circle,
+      .mermaid-diagram svg .node polygon {
+        fill: var(--color-bg-secondary) !important;
+        stroke: var(--color-accent) !important;
+      }
+
+      .mermaid-diagram svg .edgePath .path {
+        stroke: var(--color-text-muted) !important;
+      }
+
+      .mermaid-diagram svg .arrowheadPath {
+        fill: var(--color-text-muted) !important;
       }
 
       /* Headings in content */
