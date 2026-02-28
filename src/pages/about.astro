@@ -1,0 +1,211 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="About">
+  <div class="about-page">
+    <h1>About AI Pattern Library</h1>
+    
+    <section>
+      <p>
+        The AI Pattern Library is an open-source, community-driven catalog of proven AI engineering patterns. 
+        Educational content about AI patterns is scattered across blog posts, research papers, and tutorials. 
+        This project provides a structured, searchable, and executable reference.
+      </p>
+    </section>
+
+    <section>
+      <h2>What's a Pattern?</h2>
+      <p>
+        Each pattern in this library represents a well-established approach to solving a common AI engineering 
+        challenge. Patterns include:
+      </p>
+      <ul>
+        <li><strong>Explanation</strong> — Clear description of what the pattern does and when to use it</li>
+        <li><strong>Architecture Diagram</strong> — Visual representation using Mermaid diagrams</li>
+        <li><strong>Runnable Code</strong> — Python examples you can execute right in the browser</li>
+        <li><strong>Gotchas</strong> — Real-world pitfalls and how to avoid them</li>
+        <li><strong>Related Patterns</strong> — Links to complementary or alternative approaches</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Categories</h2>
+      <div class="category-grid">
+        <div class="category-item">
+          <span class="cat-icon">📚</span>
+          <h3>Retrieval</h3>
+          <p>Patterns for retrieving and grounding with external data (RAG, hybrid search, etc.)</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">🧠</span>
+          <h3>Reasoning</h3>
+          <p>Chain-of-thought, tree-of-thought, self-consistency, and structured reasoning</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">🔧</span>
+          <h3>Tool Use</h3>
+          <p>Function calling, API integration, and tool selection strategies</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">💾</span>
+          <h3>Memory</h3>
+          <p>Short-term, long-term, and episodic memory for conversational AI</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">🤖</span>
+          <h3>Agents</h3>
+          <p>Autonomous agents, multi-agent systems, and agent architectures</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">📊</span>
+          <h3>Evaluation</h3>
+          <p>LLM-as-judge, automated testing, and quality assurance patterns</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">🎼</span>
+          <h3>Orchestration</h3>
+          <p>Chaining, routing, parallelization, and workflow patterns</p>
+        </div>
+        <div class="category-item">
+          <span class="cat-icon">🛡️</span>
+          <h3>Safety</h3>
+          <p>Guardrails, content filtering, output validation, and responsible AI</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Contributing</h2>
+      <p>
+        This is an open-source project and we welcome contributions! You can add new patterns, 
+        improve existing ones, fix bugs, or enhance the site.
+      </p>
+      <p>
+        See our <a href="https://github.com/yourusername/ai-pattern-library/blob/main/CONTRIBUTING.md">Contributing Guide</a> 
+        for details on how to submit a pattern via GitHub PR.
+      </p>
+    </section>
+
+    <section>
+      <h2>Tech Stack</h2>
+      <ul>
+        <li><strong>Astro</strong> — Static site generator</li>
+        <li><strong>MDX</strong> — Content with interactive components</li>
+        <li><strong>Mermaid</strong> — Architecture diagrams</li>
+        <li><strong>Pyodide</strong> — In-browser Python execution</li>
+        <li><strong>GitHub Pages</strong> — Hosting</li>
+      </ul>
+    </section>
+
+    <div class="cta">
+      <a href={`${base}/`} class="btn">Browse Patterns →</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-page {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .about-page h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+  }
+
+  section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  section p {
+    color: var(--color-text-muted);
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+  }
+
+  section ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  section ul li {
+    padding: 0.4rem 0;
+    color: var(--color-text-muted);
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  section ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--color-accent);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .category-item {
+    padding: 1rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .cat-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .category-item h3 {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .category-item p {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+  }
+
+  .cta {
+    text-align: center;
+    margin: 3rem 0;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background: var(--color-accent);
+    color: #fff;
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    background: var(--color-accent-hover);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+</style>

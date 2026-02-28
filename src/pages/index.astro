@@ -1,0 +1,158 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PatternCard from '../components/PatternCard.astro';
+import SearchFilter from '../components/SearchFilter.astro';
+import { getCollection } from 'astro:content';
+
+const patterns = await getCollection('patterns');
+const sortedPatterns = patterns.sort((a, b) => a.data.title.localeCompare(b.data.title));
+
+const categories = [...new Set(patterns.map(p => p.data.category))].sort();
+const difficulties = ['beginner', 'intermediate', 'advanced'];
+---
+
+<BaseLayout title="Home">
+  <section class="hero">
+    <h1>AI Pattern Library</h1>
+    <p class="hero-subtitle">
+      A searchable, interactive catalog of proven AI engineering patterns — with explanations, 
+      architecture diagrams, runnable code, and real-world gotchas.
+    </p>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-number">{patterns.length}</span>
+        <span class="stat-label">Patterns</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">{categories.length}</span>
+        <span class="stat-label">Categories</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">✓</span>
+        <span class="stat-label">Runnable Code</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="patterns-section">
+    <SearchFilter categories={categories} difficulties={difficulties} />
+
+    <div class="patterns-grid">
+      {sortedPatterns.map(pattern => (
+        <div
+          data-pattern-card
+          data-title={pattern.data.title}
+          data-description={pattern.data.description}
+          data-tags={pattern.data.tags.join(',')}
+          data-category={pattern.data.category}
+          data-difficulty={pattern.data.difficulty}
+        >
+          <PatternCard
+            title={pattern.data.title}
+            description={pattern.data.description}
+            category={pattern.data.category}
+            difficulty={pattern.data.difficulty}
+            tags={pattern.data.tags}
+            slug={pattern.id}
+          />
+        </div>
+      ))}
+    </div>
+
+    <div id="no-results" style="display: none;">
+      <div class="no-results-content">
+        <span class="no-results-icon">🔍</span>
+        <p>No patterns match your search.</p>
+        <p class="no-results-hint">Try a different search term or clear the filters.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: 3rem 0 2.5rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 2.5rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+
+  .hero-subtitle {
+    max-width: 640px;
+    margin: 0 auto 2rem;
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-accent);
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .patterns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+  }
+
+  .no-results-content {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-muted);
+  }
+
+  .no-results-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .no-results-hint {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 1.8rem;
+    }
+    .hero-stats {
+      gap: 2rem;
+    }
+    .patterns-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

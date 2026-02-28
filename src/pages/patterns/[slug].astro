@@ -1,0 +1,186 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const patterns = await getCollection('patterns');
+  return patterns.map(pattern => ({
+    params: { slug: pattern.id },
+    props: { pattern },
+  }));
+}
+
+const { pattern } = Astro.props;
+const { Content } = await render(pattern);
+const base = import.meta.env.BASE_URL;
+
+const categoryColors: Record<string, string> = {
+  retrieval: '#58a6ff',
+  reasoning: '#bc8cff',
+  'tool-use': '#3fb950',
+  memory: '#d29922',
+  agents: '#f85149',
+  evaluation: '#79c0ff',
+  orchestration: '#f778ba',
+  safety: '#ffa657',
+};
+
+const difficultyColors: Record<string, string> = {
+  beginner: '#3fb950',
+  intermediate: '#d29922',
+  advanced: '#f85149',
+};
+---
+
+<BaseLayout title={pattern.data.title} description={pattern.data.description}>
+  <article class="pattern-page">
+    <nav class="breadcrumb">
+      <a href={`${base}/`}>← All Patterns</a>
+    </nav>
+
+    <header class="pattern-header">
+      <div class="pattern-meta">
+        <span class="badge category-badge" style={`--badge-color: ${categoryColors[pattern.data.category] || '#58a6ff'}`}>
+          {pattern.data.category}
+        </span>
+        <span class="badge difficulty-badge" style={`--badge-color: ${difficultyColors[pattern.data.difficulty] || '#8b949e'}`}>
+          {pattern.data.difficulty}
+        </span>
+      </div>
+      <h1>{pattern.data.title}</h1>
+      <p class="pattern-description">{pattern.data.description}</p>
+      <div class="pattern-tags">
+        {pattern.data.tags.map((tag: string) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+    </header>
+
+    <div class="pattern-content">
+      <Content />
+    </div>
+
+    {pattern.data.relatedPatterns && pattern.data.relatedPatterns.length > 0 && (
+      <aside class="related-patterns">
+        <h2>Related Patterns</h2>
+        <div class="related-list">
+          {pattern.data.relatedPatterns.map((slug: string) => (
+            <a href={`${base}/patterns/${slug}/`} class="related-link">
+              {slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+            </a>
+          ))}
+        </div>
+      </aside>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .pattern-page {
+    max-width: 840px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumb a {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-accent);
+  }
+
+  .pattern-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .pattern-meta {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.25em 0.7em;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--badge-color) 15%, transparent);
+    color: var(--badge-color);
+    border: 1px solid color-mix(in srgb, var(--badge-color) 30%, transparent);
+  }
+
+  .pattern-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    line-height: 1.2;
+  }
+
+  .pattern-description {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .pattern-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 0.2em 0.6em;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text-muted);
+  }
+
+  .related-patterns {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related-patterns h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .related-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .related-link {
+    padding: 0.5rem 1rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .related-link:hover {
+    border-color: var(--color-accent);
+    background: var(--color-bg-tertiary);
+  }
+
+  @media (max-width: 768px) {
+    .pattern-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>

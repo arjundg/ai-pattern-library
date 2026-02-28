@@ -1,0 +1,101 @@
+---
+interface Props {
+  type: 'info' | 'warning' | 'tip' | 'danger';
+  title?: string;
+}
+
+const { type = 'info', title } = Astro.props;
+
+const icons: Record<string, string> = {
+  info: 'ℹ️',
+  warning: '⚠️',
+  tip: '💡',
+  danger: '🚨',
+};
+
+const defaultTitles: Record<string, string> = {
+  info: 'Note',
+  warning: 'Warning',
+  tip: 'Tip',
+  danger: 'Gotcha',
+};
+---
+
+<div class={`callout callout-${type}`}>
+  <div class="callout-header">
+    <span class="callout-icon">{icons[type]}</span>
+    <span class="callout-title">{title || defaultTitles[type]}</span>
+  </div>
+  <div class="callout-body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .callout {
+    margin: 1.5rem 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .callout-body {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+
+  .callout-body :global(p) {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout-body :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .callout-info {
+    border-color: color-mix(in srgb, #58a6ff 40%, var(--color-border));
+    background: color-mix(in srgb, #58a6ff 5%, var(--color-bg-secondary));
+  }
+  .callout-info .callout-header {
+    background: color-mix(in srgb, #58a6ff 10%, var(--color-bg-secondary));
+    color: #58a6ff;
+  }
+
+  .callout-warning {
+    border-color: color-mix(in srgb, #d29922 40%, var(--color-border));
+    background: color-mix(in srgb, #d29922 5%, var(--color-bg-secondary));
+  }
+  .callout-warning .callout-header {
+    background: color-mix(in srgb, #d29922 10%, var(--color-bg-secondary));
+    color: #d29922;
+  }
+
+  .callout-tip {
+    border-color: color-mix(in srgb, #3fb950 40%, var(--color-border));
+    background: color-mix(in srgb, #3fb950 5%, var(--color-bg-secondary));
+  }
+  .callout-tip .callout-header {
+    background: color-mix(in srgb, #3fb950 10%, var(--color-bg-secondary));
+    color: #3fb950;
+  }
+
+  .callout-danger {
+    border-color: color-mix(in srgb, #f85149 40%, var(--color-border));
+    background: color-mix(in srgb, #f85149 5%, var(--color-bg-secondary));
+  }
+  .callout-danger .callout-header {
+    background: color-mix(in srgb, #f85149 10%, var(--color-bg-secondary));
+    color: #f85149;
+  }
+</style>

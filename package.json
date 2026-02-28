@@ -1,0 +1,16 @@
+{
+  "name": "ai-pattern-library",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Interactive AI Pattern Library — A searchable web app cataloging proven AI engineering patterns",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.17.1",
+    "@astrojs/mdx": "^4.3.0"
+  }
+}

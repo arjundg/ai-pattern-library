@@ -1,0 +1,247 @@
+---
+interface Props {
+  code: string;
+  language?: string;
+}
+
+const { code, language = 'python' } = Astro.props;
+const uniqueId = `playground-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<div class="playground" id={uniqueId}>
+  <div class="playground-header">
+    <span class="playground-label">▶ Interactive Example ({language})</span>
+    <div class="playground-actions">
+      <button class="copy-btn" title="Copy code">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+        <span class="copy-text">Copy</span>
+      </button>
+      <button class="run-btn" title="Run in Pyodide">
+        ▶ Run
+      </button>
+    </div>
+  </div>
+  <div class="playground-editor">
+    <textarea class="code-input" spellcheck="false">{code.trim()}</textarea>
+  </div>
+  <div class="playground-output" style="display: none;">
+    <div class="output-header">Output</div>
+    <pre class="output-content"></pre>
+  </div>
+</div>
+
+<script>
+  // Pyodide lazy loader
+  let pyodideReady: Promise<any> | null = null;
+
+  function loadPyodide() {
+    if (pyodideReady) return pyodideReady;
+    pyodideReady = new Promise(async (resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';
+      script.onload = async () => {
+        // @ts-ignore
+        const pyodide = await globalThis.loadPyodide();
+        resolve(pyodide);
+      };
+      document.head.appendChild(script);
+    });
+    return pyodideReady;
+  }
+
+  document.querySelectorAll('.playground').forEach(playground => {
+    const textarea = playground.querySelector('.code-input') as HTMLTextAreaElement;
+    const runBtn = playground.querySelector('.run-btn') as HTMLButtonElement;
+    const copyBtn = playground.querySelector('.copy-btn') as HTMLButtonElement;
+    const outputSection = playground.querySelector('.playground-output') as HTMLDivElement;
+    const outputContent = playground.querySelector('.output-content') as HTMLPreElement;
+
+    // Auto-resize textarea
+    function autoResize() {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+    textarea.addEventListener('input', autoResize);
+    autoResize();
+
+    // Tab key support
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        textarea.value = textarea.value.substring(0, start) + '    ' + textarea.value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + 4;
+      }
+    });
+
+    // Copy button
+    copyBtn.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(textarea.value);
+      const copyText = copyBtn.querySelector('.copy-text')!;
+      copyText.textContent = 'Copied!';
+      setTimeout(() => { copyText.textContent = 'Copy'; }, 1500);
+    });
+
+    // Run button
+    runBtn.addEventListener('click', async () => {
+      runBtn.disabled = true;
+      runBtn.textContent = '⏳ Loading...';
+      outputSection.style.display = 'block';
+      outputContent.textContent = 'Loading Python runtime...';
+
+      try {
+        const pyodide = await loadPyodide();
+        runBtn.textContent = '⏳ Running...';
+
+        // Redirect stdout
+        pyodide.runPython(`
+import sys
+from io import StringIO
+sys.stdout = StringIO()
+sys.stderr = StringIO()
+        `);
+
+        try {
+          pyodide.runPython(textarea.value);
+          const stdout = pyodide.runPython('sys.stdout.getvalue()');
+          const stderr = pyodide.runPython('sys.stderr.getvalue()');
+          outputContent.textContent = stdout + (stderr ? '\n[stderr] ' + stderr : '') || '(no output)';
+        } catch (err: any) {
+          outputContent.textContent = `Error: ${err.message}`;
+          outputContent.style.color = '#f85149';
+          setTimeout(() => { outputContent.style.color = ''; }, 3000);
+        }
+      } catch (err: any) {
+        outputContent.textContent = `Failed to load Python: ${err.message}`;
+      }
+
+      runBtn.disabled = false;
+      runBtn.textContent = '▶ Run';
+    });
+  });
+</script>
+
+<style>
+  .playground {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 1.5rem 0;
+    background: var(--color-bg-secondary);
+  }
+
+  .playground-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: var(--color-bg-tertiary);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .playground-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-green);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .playground-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .copy-btn,
+  .run-btn {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .copy-btn {
+    background: transparent;
+    color: var(--color-text-muted);
+  }
+
+  .copy-btn:hover {
+    color: var(--color-text);
+    border-color: var(--color-text-muted);
+  }
+
+  .run-btn {
+    background: color-mix(in srgb, var(--color-green) 15%, transparent);
+    color: var(--color-green);
+    border-color: color-mix(in srgb, var(--color-green) 40%, transparent);
+    font-weight: 600;
+  }
+
+  .run-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-green) 25%, transparent);
+  }
+
+  .run-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .playground-editor {
+    position: relative;
+  }
+
+  .code-input {
+    width: 100%;
+    padding: 1rem;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border: none;
+    outline: none;
+    resize: none;
+    overflow: hidden;
+    min-height: 100px;
+    tab-size: 4;
+  }
+
+  .playground-output {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .output-header {
+    padding: 0.4rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    background: var(--color-bg-tertiary);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .output-content {
+    padding: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: var(--color-text-muted);
+  }
+</style>
