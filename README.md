@@ -83,6 +83,26 @@ ai-pattern-library/
 | `npm run build` | Build static site to `./dist/` |
 | `npm run preview` | Preview production build locally |
 
+## Deployment
+
+This site is configured for easy deployment to GitHub Pages or GitLab Pages.
+
+### GitHub Pages (Quick Start)
+
+1. **Enable GitHub Pages**: Go to Settings → Pages → Set source to "GitHub Actions"
+2. **Push to deploy**: `git push origin main`
+3. **Access**: `https://arjundg.github.io/ai-pattern-library/`
+
+The GitHub Actions workflow will automatically build and deploy on every push to `main`.
+
+### Full Deployment Guide
+
+See **[DEPLOYMENT.md](DEPLOYMENT.md)** for complete instructions covering:
+- GitHub Pages setup
+- GitLab Pages setup
+- Custom domain configuration
+- Troubleshooting
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to add new patterns.
